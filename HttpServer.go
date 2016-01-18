@@ -1,48 +1,11 @@
-package main
+package rizo
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 )
-
-func hello(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		w.WriteHeader(http.StatusCreated)
-	} else {
-		io.WriteString(w, "Hello world!")
-	}
-}
-
-//PathHandler ...
-type PathHandler struct {
-	handlers map[string]http.HandlerFunc
-}
-
-//NewPathHandler ...
-func NewPathHandler() *PathHandler {
-	return &PathHandler{
-		handlers: map[string]http.HandlerFunc{},
-	}
-}
-
-//Get ...
-func (instance *PathHandler) Get(handler http.HandlerFunc) {
-	instance.handlers["GET"] = handler
-}
-
-//Handle ...
-func (instance *PathHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	method := strings.ToUpper(r.Method)
-	if handler, ok := instance.handlers[method]; ok {
-		handler(w, r)
-	} else {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
-}
 
 //HTTPServer ...
 type HTTPServer struct {
