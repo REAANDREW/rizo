@@ -11,10 +11,6 @@ import (
 
 const ServerPort = 5000
 
-func TestServerStartStop(t *testing.T) {
-
-}
-
 func TestAddingRouteToHttpServer(t *testing.T) {
 	const ResponseMessage string = "Hello World!"
 	server := NewHTTPServer(ServerPort)

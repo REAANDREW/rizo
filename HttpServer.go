@@ -17,21 +17,25 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type pathHandler struct {
+//PathHandler ...
+type PathHandler struct {
 	handlers map[string]http.HandlerFunc
 }
 
-func newPathHandler() *pathHandler {
-	return &pathHandler{
+//NewPathHandler ...
+func NewPathHandler() *PathHandler {
+	return &PathHandler{
 		handlers: map[string]http.HandlerFunc{},
 	}
 }
 
-func (instance *pathHandler) Get(handler http.HandlerFunc) {
+//Get ...
+func (instance *PathHandler) Get(handler http.HandlerFunc) {
 	instance.handlers["GET"] = handler
 }
 
-func (instance *pathHandler) Handle(w http.ResponseWriter, r *http.Request) {
+//Handle ...
+func (instance *PathHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	method := strings.ToUpper(r.Method)
 	if handler, ok := instance.handlers[method]; ok {
 		handler(w, r)
@@ -46,14 +50,14 @@ type HTTPServer struct {
 	listener net.Listener
 	server   *http.Server
 	mux      *http.ServeMux
-	paths    map[string]*pathHandler
+	paths    map[string]*PathHandler
 }
 
 //NewHTTPServer ...
 func NewHTTPServer(port uint) *HTTPServer {
 	return &HTTPServer{
 		Port:  port,
-		paths: map[string]*pathHandler{},
+		paths: map[string]*PathHandler{},
 	}
 }
 
@@ -102,7 +106,7 @@ func (instance *HTTPServer) Stop() {
 //Get ...
 func (instance *HTTPServer) Get(path string, handler http.HandlerFunc) {
 	if _, ok := instance.paths[path]; !ok {
-		instance.paths[path] = newPathHandler()
+		instance.paths[path] = NewPathHandler()
 	}
 	instance.paths[path].Get(handler)
 }
