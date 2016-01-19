@@ -111,3 +111,24 @@ func TestHandlePatch(t *testing.T) {
 	assert.Equal(t, string(responseWriter.Data), expectedMessage)
 
 }
+
+func TestHandleOtherMethod(t *testing.T) {
+
+	//Arrange
+	const expectedMessage string = "handled the BOOM"
+	defer responseWriter.Reset()
+	handler := NewPathHandler()
+
+	handler.Method("BOOM", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(expectedMessage))
+	})
+
+	//Act
+	handler.Handle(responseWriter, &http.Request{
+		Method: "BOOM",
+	})
+
+	//Assert
+	assert.Equal(t, string(responseWriter.Data), expectedMessage)
+
+}

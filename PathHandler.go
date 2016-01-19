@@ -19,27 +19,33 @@ func NewPathHandler() *PathHandler {
 
 //Get ...
 func (instance *PathHandler) Get(handler http.HandlerFunc) {
-	instance.handlers["GET"] = handler
+	instance.Method("GET", handler)
 }
 
 //Post ...
 func (instance *PathHandler) Post(handler http.HandlerFunc) {
-	instance.handlers["POST"] = handler
+	instance.Method("POST", handler)
 }
 
 //Put ...
 func (instance *PathHandler) Put(handler http.HandlerFunc) {
-	instance.handlers["PUT"] = handler
+	instance.Method("PUT", handler)
 }
 
 //Delete ...
 func (instance *PathHandler) Delete(handler http.HandlerFunc) {
-	instance.handlers["DELETE"] = handler
+	instance.Method("DELETE", handler)
 }
 
 //Patch ...
 func (instance *PathHandler) Patch(handler http.HandlerFunc) {
-	instance.handlers["PATCH"] = handler
+	instance.Method("PATCH", handler)
+}
+
+//Method ...
+func (instance *PathHandler) Method(method string, handler http.HandlerFunc) {
+	upperCaseMethod := strings.ToUpper(method)
+	instance.handlers[upperCaseMethod] = handler
 }
 
 //Handle ...
