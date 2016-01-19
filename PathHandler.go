@@ -32,6 +32,11 @@ func (instance *PathHandler) Put(handler http.HandlerFunc) {
 	instance.handlers["PUT"] = handler
 }
 
+//Delete ...
+func (instance *PathHandler) Delete(handler http.HandlerFunc) {
+	instance.handlers["DELETE"] = handler
+}
+
 //Handle ...
 func (instance *PathHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	method := strings.ToUpper(r.Method)
