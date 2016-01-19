@@ -7,10 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var responseWriter = &FakeResponseWriter{}
+
 func TestHandleGet(t *testing.T) {
 
 	const expectedMessage string = "handled the GET"
-	responseWriter := &FakeResponseWriter{}
 	defer responseWriter.Reset()
 	handler := NewPathHandler()
 
@@ -29,7 +30,6 @@ func TestHandleGet(t *testing.T) {
 func TestHandlePost(t *testing.T) {
 
 	const expectedMessage string = "handled the POST"
-	responseWriter := &FakeResponseWriter{}
 	defer responseWriter.Reset()
 	handler := NewPathHandler()
 
