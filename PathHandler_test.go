@@ -90,3 +90,24 @@ func TestHandleDelete(t *testing.T) {
 	assert.Equal(t, string(responseWriter.Data), expectedMessage)
 
 }
+
+func TestHandlePatch(t *testing.T) {
+
+	//Arrange
+	const expectedMessage string = "handled the PATCH"
+	defer responseWriter.Reset()
+	handler := NewPathHandler()
+
+	handler.Patch(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(expectedMessage))
+	})
+
+	//Act
+	handler.Handle(responseWriter, &http.Request{
+		Method: "PATCH",
+	})
+
+	//Assert
+	assert.Equal(t, string(responseWriter.Data), expectedMessage)
+
+}

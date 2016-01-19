@@ -37,6 +37,11 @@ func (instance *PathHandler) Delete(handler http.HandlerFunc) {
 	instance.handlers["DELETE"] = handler
 }
 
+//Patch ...
+func (instance *PathHandler) Patch(handler http.HandlerFunc) {
+	instance.handlers["PATCH"] = handler
+}
+
 //Handle ...
 func (instance *PathHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	method := strings.ToUpper(r.Method)
