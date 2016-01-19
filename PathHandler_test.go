@@ -9,7 +9,7 @@ import (
 
 func TestHandleGet(t *testing.T) {
 
-	const expectedMessage string = "handled the get"
+	const expectedMessage string = "handled the GET"
 	responseWriter := &FakeResponseWriter{}
 	defer responseWriter.Reset()
 	handler := NewPathHandler()
@@ -20,6 +20,25 @@ func TestHandleGet(t *testing.T) {
 
 	handler.Handle(responseWriter, &http.Request{
 		Method: "GET",
+	})
+
+	assert.Equal(t, string(responseWriter.Data), expectedMessage)
+
+}
+
+func TestHandlePost(t *testing.T) {
+
+	const expectedMessage string = "handled the POST"
+	responseWriter := &FakeResponseWriter{}
+	defer responseWriter.Reset()
+	handler := NewPathHandler()
+
+	handler.Post(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(expectedMessage))
+	})
+
+	handler.Handle(responseWriter, &http.Request{
+		Method: "POST",
 	})
 
 	assert.Equal(t, string(responseWriter.Data), expectedMessage)

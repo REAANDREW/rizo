@@ -22,6 +22,11 @@ func (instance *PathHandler) Get(handler http.HandlerFunc) {
 	instance.handlers["GET"] = handler
 }
 
+//Post ...
+func (instance *PathHandler) Post(handler http.HandlerFunc) {
+	instance.handlers["POST"] = handler
+}
+
 //Handle ...
 func (instance *PathHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	method := strings.ToUpper(r.Method)
