@@ -3,33 +3,25 @@ package rizo
 import (
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
-
-type FakeResponseWriter struct {
-	Data []byte
-}
-
-func (instance *FakeResponseWriter) Header() http.Header {
-	return nil
-}
-
-func (instance *FakeResponseWriter) Write(data []byte) (int, error) {
-	return 0, nil
-}
-
-func (instance *FakeResponseWriter) WriteHeader(int) {
-
-}
 
 func TestHandleGet(t *testing.T) {
 
 	const expectedMessage string = "handled the get"
 	responseWriter := &FakeResponseWriter{}
+	defer responseWriter.Reset()
 	handler := NewPathHandler()
 
 	handler.Get(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(expectedMessage))
 	})
 
-	handler.Handle(responseWriter, &http.Request{})
+	handler.Handle(responseWriter, &http.Request{
+		Method: "GET",
+	})
+
+	assert.Equal(t, string(responseWriter.Data), expectedMessage)
+
 }
