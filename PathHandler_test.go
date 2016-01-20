@@ -2,133 +2,109 @@ package rizo
 
 import (
 	"net/http"
-	"testing"
 
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var responseWriter = &FakeResponseWriter{}
 
-func TestHandleGet(t *testing.T) {
+var _ = Describe("PathHandler", func() {
+	var (
+		responseWriter *FakeResponseWriter
+		handler        *PathHandler
+	)
 
-	//Arrange
-	const expectedMessage string = "handled the GET"
-	defer responseWriter.Reset()
-	handler := NewPathHandler()
-	handler.Get(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(expectedMessage))
+	BeforeEach(func() {
+		responseWriter = &FakeResponseWriter{}
+		handler = NewPathHandler()
 	})
 
-	//Act
-	handler.Handle(responseWriter, &http.Request{
-		Method: "GET",
+	AfterEach(func() {
+		responseWriter.Reset()
 	})
 
-	//Assert
-	assert.Equal(t, string(responseWriter.Data), expectedMessage)
-}
+	It("Configures a GET handler", func() {
+		const expectedMessage string = "handled the GET"
 
-func TestHandlePost(t *testing.T) {
+		handler.Get(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(expectedMessage))
+		})
 
-	//Arrange
-	const expectedMessage string = "handled the POST"
-	defer responseWriter.Reset()
-	handler := NewPathHandler()
+		handler.Handle(responseWriter, &http.Request{
+			Method: "GET",
+		})
 
-	handler.Post(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(expectedMessage))
+		Expect(string(responseWriter.Data)).To(Equal(expectedMessage))
 	})
 
-	//Act
-	handler.Handle(responseWriter, &http.Request{
-		Method: "POST",
+	It("Configures a POST handler", func() {
+		const expectedMessage string = "handled the POST"
+
+		handler.Post(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(expectedMessage))
+		})
+
+		handler.Handle(responseWriter, &http.Request{
+			Method: "POST",
+		})
+
+		Expect(string(responseWriter.Data)).To(Equal(expectedMessage))
 	})
 
-	//Assert
-	assert.Equal(t, string(responseWriter.Data), expectedMessage)
+	It("Configures a PUT handler", func() {
+		const expectedMessage string = "handled the PUT"
 
-}
+		handler.Put(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(expectedMessage))
+		})
 
-func TestHandlePut(t *testing.T) {
+		handler.Handle(responseWriter, &http.Request{
+			Method: "PUT",
+		})
 
-	//Arrange
-	const expectedMessage string = "handled the PUT"
-	defer responseWriter.Reset()
-	handler := NewPathHandler()
-
-	handler.Put(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(expectedMessage))
+		Expect(string(responseWriter.Data)).To(Equal(expectedMessage))
 	})
 
-	//Act
-	handler.Handle(responseWriter, &http.Request{
-		Method: "PUT",
+	It("Configures a DELETE handler", func() {
+		const expectedMessage string = "handled the DELETE"
+
+		handler.Delete(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(expectedMessage))
+		})
+
+		handler.Handle(responseWriter, &http.Request{
+			Method: "DELETE",
+		})
+
+		Expect(string(responseWriter.Data)).To(Equal(expectedMessage))
 	})
 
-	//Assert
-	assert.Equal(t, string(responseWriter.Data), expectedMessage)
+	It("Configures a PATCH handler", func() {
+		const expectedMessage string = "handled the PATCH"
 
-}
+		handler.Patch(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(expectedMessage))
+		})
 
-func TestHandleDelete(t *testing.T) {
+		handler.Handle(responseWriter, &http.Request{
+			Method: "PATCH",
+		})
 
-	//Arrange
-	const expectedMessage string = "handled the DELETE"
-	defer responseWriter.Reset()
-	handler := NewPathHandler()
-
-	handler.Delete(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(expectedMessage))
+		Expect(string(responseWriter.Data)).To(Equal(expectedMessage))
 	})
 
-	//Act
-	handler.Handle(responseWriter, &http.Request{
-		Method: "DELETE",
+	It("Configures any other Method", func() {
+		const expectedMessage string = "handled the BOOM"
+
+		handler.Method("BOOM", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte(expectedMessage))
+		})
+
+		handler.Handle(responseWriter, &http.Request{
+			Method: "BOOM",
+		})
+
+		Expect(string(responseWriter.Data)).To(Equal(expectedMessage))
 	})
-
-	//Assert
-	assert.Equal(t, string(responseWriter.Data), expectedMessage)
-
-}
-
-func TestHandlePatch(t *testing.T) {
-
-	//Arrange
-	const expectedMessage string = "handled the PATCH"
-	defer responseWriter.Reset()
-	handler := NewPathHandler()
-
-	handler.Patch(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(expectedMessage))
-	})
-
-	//Act
-	handler.Handle(responseWriter, &http.Request{
-		Method: "PATCH",
-	})
-
-	//Assert
-	assert.Equal(t, string(responseWriter.Data), expectedMessage)
-
-}
-
-func TestHandleOtherMethod(t *testing.T) {
-
-	//Arrange
-	const expectedMessage string = "handled the BOOM"
-	defer responseWriter.Reset()
-	handler := NewPathHandler()
-
-	handler.Method("BOOM", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(expectedMessage))
-	})
-
-	//Act
-	handler.Handle(responseWriter, &http.Request{
-		Method: "BOOM",
-	})
-
-	//Assert
-	assert.Equal(t, string(responseWriter.Data), expectedMessage)
-
-}
+})
