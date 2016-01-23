@@ -64,6 +64,7 @@ func (instance *HTTPServer) Stop() {
 	if instance.listener != nil {
 		instance.listener.Close()
 	}
+	time.Sleep(1)
 }
 
 //Get ...
