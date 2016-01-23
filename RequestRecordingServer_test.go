@@ -17,12 +17,6 @@ var (
 	TestPort   = 6000
 )
 
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func URLForTestServer(path string) string {
 	return fmt.Sprintf("http://localhost:%d%s", TestPort, path)
 }

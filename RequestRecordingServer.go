@@ -11,6 +11,12 @@ import (
 	"time"
 )
 
+func check(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 //RecordedRequest ...
 type RecordedRequest struct {
 	Request *http.Request
