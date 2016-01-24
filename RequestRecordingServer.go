@@ -52,6 +52,11 @@ func CreateRequestRecordingServer(port int) *RequestRecordingServer {
 	}
 }
 
+//CreateURL ...
+func (instance *RequestRecordingServer) CreateURL(path string) string {
+	return fmt.Sprintf("http://localhost:%d%s", instance.port, path)
+}
+
 func (instance *RequestRecordingServer) evaluatePredicates(recordedRequest RecordedRequest, w http.ResponseWriter) {
 	for _, item := range instance.use {
 		if item.RequestPredicates != nil {
