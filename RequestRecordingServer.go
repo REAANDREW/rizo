@@ -90,7 +90,10 @@ func (instance *RequestRecordingServer) Start() {
 		}
 	})
 	instance.server = httptest.NewUnstartedServer(handler)
-	instance.server.Listener, _ = net.Listen("tcp", ":"+strconv.Itoa(instance.port))
+	instance.server.Listener, err = net.Listen("tcp", ":"+strconv.Itoa(instance.port))
+	if err != nil {
+		panic(err)
+	}
 	instance.server.Start()
 }
 
