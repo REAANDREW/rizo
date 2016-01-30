@@ -96,8 +96,10 @@ func (instance *RequestRecordingServer) Start() {
 
 //Stop ...
 func (instance *RequestRecordingServer) Stop() {
-	instance.server.Close()
-	time.Sleep(1 * time.Microsecond)
+	if instance.server != nil {
+		instance.server.Close()
+		time.Sleep(1 * time.Microsecond)
+	}
 }
 
 //Clear ...
