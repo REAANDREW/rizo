@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -41,6 +42,7 @@ type RequestRecordingServer struct {
 	port     int
 	server   *httptest.Server
 	use      []UseWithPredicates
+	lock     *sync.Mutex
 }
 
 //CreateRequestRecordingServer ...
@@ -49,6 +51,7 @@ func CreateRequestRecordingServer(port int) *RequestRecordingServer {
 		Requests: []RecordedRequest{},
 		port:     port,
 		use:      []UseWithPredicates{},
+		lock:     &sync.Mutex{},
 	}
 }
 
@@ -82,7 +85,9 @@ func (instance *RequestRecordingServer) Start() {
 			Request: r,
 			body:    string(body),
 		}
+		instance.lock.Lock()
 		instance.Requests = append(instance.Requests, recordedRequest)
+		instance.lock.Unlock()
 		if instance.use != nil {
 			instance.evaluatePredicates(recordedRequest, w)
 		} else {
