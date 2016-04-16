@@ -3,7 +3,6 @@ package rizo
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -164,9 +163,6 @@ func (instance *RequestRecordingServer) For(predicates ...HTTPRequestPredicate) 
 func RequestWithPath(path string) HTTPRequestPredicate {
 	return HTTPRequestPredicate(func(r RecordedRequest) bool {
 		result := r.Request.URL.Path == path
-		if !result {
-			log.Println(fmt.Sprintf("path does not equal %s it equals %s", path, r.Request.URL.Path))
-		}
 		return result
 	})
 }
@@ -175,9 +171,6 @@ func RequestWithPath(path string) HTTPRequestPredicate {
 func RequestWithMethod(method string) HTTPRequestPredicate {
 	return HTTPRequestPredicate(func(r RecordedRequest) bool {
 		result := r.Request.Method == method
-		if !result {
-			log.Println("request method does not equal " + method)
-		}
 		return result
 	})
 }
@@ -186,9 +179,6 @@ func RequestWithMethod(method string) HTTPRequestPredicate {
 func RequestWithHeader(key string, value string) HTTPRequestPredicate {
 	return HTTPRequestPredicate(func(r RecordedRequest) bool {
 		result := r.Request.Header.Get(key) == value
-		if !result {
-			log.Println(fmt.Sprintf("request method does not contain header with key %s and value %s actual %s", key, value, r.Request.Header.Get(key)))
-		}
 		return result
 	})
 }
@@ -197,9 +187,6 @@ func RequestWithHeader(key string, value string) HTTPRequestPredicate {
 func RequestWithBody(value string) HTTPRequestPredicate {
 	return HTTPRequestPredicate(func(r RecordedRequest) bool {
 		result := string(r.body) == value
-		if !result {
-			log.Println(fmt.Sprintf("request body does not equal %s it equals %s", value, r.body))
-		}
 		return result
 	})
 }
@@ -208,9 +195,6 @@ func RequestWithBody(value string) HTTPRequestPredicate {
 func RequestWithQuerystring(value string) HTTPRequestPredicate {
 	return HTTPRequestPredicate(func(r RecordedRequest) bool {
 		result := r.Request.URL.RawQuery == value
-		if !result {
-			log.Println("request query does not equal " + value + " | it equals " + r.Request.URL.RawQuery)
-		}
 		return result
 	})
 }
