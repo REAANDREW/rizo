@@ -152,15 +152,13 @@ var _ = Describe("RequestRecordingServer", func() {
 			TestServer.Clear()
 		})
 
-		It("Defines the response to be used for the server", func() {
+		FIt("Defines the response to be used for the server", func() {
 			message := "Hello World"
 
-			factory := HTTPResponseFactory(func(w http.ResponseWriter) {
+			TestServer.Use(func(w http.ResponseWriter) {
 				_, err := io.WriteString(w, message)
 				check(err)
 			})
-
-			TestServer.Use(factory)
 
 			response, body, err := HTTPRequestDo("GET", fmt.Sprintf("http://localhost:%d", TestPort), nil, nil)
 
