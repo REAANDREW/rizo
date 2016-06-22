@@ -135,7 +135,7 @@ func (instance *RequestRecordingServer) Evaluate(request RecordedRequest, predic
 //Find ...
 func (instance *RequestRecordingServer) Find(predicates ...HTTPRequestPredicate) bool {
 	for _, request := range instance.Requests {
-		if instance.Evaluate(request) {
+		if instance.Evaluate(request, predicates...) {
 			return true
 		}
 	}
