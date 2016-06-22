@@ -64,7 +64,7 @@ var _ = Describe("RequestRecordingServer", func() {
 				request.Header.Set("Content-type", "application/json")
 				TestServer.Requests = append(TestServer.Requests, RecordedRequest{
 					Request: request,
-					body:    data,
+					Body:    data,
 				})
 			})
 
@@ -87,7 +87,7 @@ var _ = Describe("RequestRecordingServer", func() {
 				TestServer.Clear()
 				TestServer.Requests = append(TestServer.Requests, RecordedRequest{
 					Request: request,
-					body:    data,
+					Body:    data,
 				})
 				Expect(TestServer.Find(RequestWithBody(data))).To(Equal(true))
 			})
@@ -116,7 +116,7 @@ var _ = Describe("RequestRecordingServer", func() {
 				postRequest, _ := http.NewRequest("POST", sampleURL, bytes.NewBuffer([]byte(data)))
 				TestServer.Requests = append(TestServer.Requests, RecordedRequest{
 					Request: postRequest,
-					body:    data,
+					Body:    data,
 				})
 			})
 

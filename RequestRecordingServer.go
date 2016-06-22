@@ -20,7 +20,7 @@ func check(err error) {
 //RecordedRequest ...
 type RecordedRequest struct {
 	Request *http.Request
-	body    string
+	Body    string
 }
 
 //HTTPRequestPredicate ...
@@ -82,7 +82,7 @@ func (instance *RequestRecordingServer) Start() {
 		check(err)
 		recordedRequest := RecordedRequest{
 			Request: r,
-			body:    string(body),
+			Body:    string(body),
 		}
 		instance.lock.Lock()
 		instance.Requests = append(instance.Requests, recordedRequest)
@@ -186,7 +186,7 @@ func RequestWithHeader(key string, value string) HTTPRequestPredicate {
 //RequestWithBody ...
 func RequestWithBody(value string) HTTPRequestPredicate {
 	return HTTPRequestPredicate(func(r RecordedRequest) bool {
-		result := string(r.body) == value
+		result := string(r.Body) == value
 		return result
 	})
 }
