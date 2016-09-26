@@ -86,12 +86,12 @@ func (instance *RequestRecordingServer) Start() {
 		}
 		instance.lock.Lock()
 		instance.Requests = append(instance.Requests, recordedRequest)
-		instance.lock.Unlock()
 		if instance.use != nil {
 			instance.evaluatePredicates(recordedRequest, w)
 		} else {
 			w.WriteHeader(http.StatusOK)
 		}
+		instance.lock.Unlock()
 	})
 	instance.server = httptest.NewUnstartedServer(handler)
 	listener, err := net.Listen("tcp", ":"+strconv.Itoa(instance.port))
@@ -112,8 +112,10 @@ func (instance *RequestRecordingServer) Stop() {
 
 //Clear ...
 func (instance *RequestRecordingServer) Clear() {
+	instance.lock.Lock()
 	instance.Requests = []RecordedRequest{}
 	instance.use = []UseWithPredicates{}
+	instance.lock.Unlock()
 }
 
 //Evaluate ...
