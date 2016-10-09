@@ -152,7 +152,7 @@ var _ = Describe("RequestRecordingServer", func() {
 			TestServer.Clear()
 		})
 
-		FIt("Defines the response to be used for the server", func() {
+		It("Defines the response to be used for the server", func() {
 			message := "Hello World"
 
 			TestServer.Use(func(w http.ResponseWriter) {
