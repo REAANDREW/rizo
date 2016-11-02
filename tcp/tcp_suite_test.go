@@ -1,8 +1,8 @@
 package tcp_test
 
 import (
-	"io/ioutil"
-	"log"
+	// "io/ioutil"
+	// "log"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestRizoTCP(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
+	// log.SetOutput(ioutil.Discard)
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Rizo TCP Suite")
 }

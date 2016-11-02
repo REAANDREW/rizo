@@ -30,7 +30,7 @@ type ResponseWriter interface {
 type RequestPredicate func(request RecordedRequest) bool
 
 //ResponseFactory ...
-type ResponseFactory func(writer ResponseWriter)
+type ResponseFactory func(request RecordedRequest, writer ResponseWriter)
 
 //UseWithPredicates ...
 type UseWithPredicates struct {
@@ -58,23 +58,22 @@ func New(port int) *RequestRecordingServer {
 	server := tcp_server.New(fmt.Sprintf("localhost:%v", port))
 
 	server.OnNewClient(func(c *tcp_server.Client) {
-		// new client connected
-		// lets send some message
 		fmt.Println("New client")
-		c.Send("Hello")
 	})
 	server.OnNewMessage(func(c *tcp_server.Client, message string) {
 		// new message received
-		fmt.Println("message recieved")
+		fmt.Println("message recieved: " + message)
 		// c.Send(":48293\r\n")
 		recordedRequest := RecordedRequest{
 			Body: message,
 		}
 		instance.lock.Lock()
 		instance.Requests = append(instance.Requests, recordedRequest)
-		if instance.use != nil {
+		if len(instance.use) > 0 {
+			fmt.Println("instance.use is not nil")
 			instance.evaluatePredicates(recordedRequest, c)
 		} else {
+			fmt.Println("sending " + message)
 			c.Send(message)
 		}
 		instance.lock.Unlock()
@@ -127,10 +126,12 @@ func (instance *RequestRecordingServer) For(predicates ...RequestPredicate) {
 
 //Evaluate ...
 func (instance *RequestRecordingServer) Evaluate(request RecordedRequest, predicates ...RequestPredicate) bool {
+	fmt.Println("Evaluate")
 	results := make([]bool, len(predicates))
 	for index, predicate := range predicates {
 		results[index] = predicate(request)
 	}
+	fmt.Printf("Results: %#v\n", results)
 	thing := true
 	for _, result := range results {
 		if !result {
@@ -144,6 +145,7 @@ func (instance *RequestRecordingServer) Evaluate(request RecordedRequest, predic
 //Find ...
 func (instance *RequestRecordingServer) Find(predicates ...RequestPredicate) bool {
 	for _, request := range instance.Requests {
+		fmt.Printf("Find: %#v\n", request)
 		if instance.Evaluate(request, predicates...) {
 			return true
 		}
@@ -160,15 +162,16 @@ func RequestWithBody(value string) RequestPredicate {
 }
 
 func (instance *RequestRecordingServer) evaluatePredicates(recordedRequest RecordedRequest, c *tcp_server.Client) {
+	fmt.Println("Invoking ResponseFactory")
 	for _, item := range instance.use {
 		if item.RequestPredicates != nil {
 			result := instance.Evaluate(recordedRequest, item.RequestPredicates...)
 			if result {
-				item.ResponseFactory(c)
+				item.ResponseFactory(recordedRequest, c)
 				return
 			}
 		} else {
-			item.ResponseFactory(c)
+			item.ResponseFactory(recordedRequest, c)
 			return
 		}
 	}

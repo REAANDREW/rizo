@@ -1,13 +1,18 @@
 package tcp
 
-import (
-	"fmt"
-	"log"
-	"net"
-	"sync"
-	"time"
-)
+// import (
+// 	"fmt"
+// 	"log"
+// 	"net"
+// 	"sync"
+// 	"time"
+// )
 
+type TCPServer interface {
+	Listen()
+}
+
+/*
 type TCPServer struct {
 	addr    *net.TCPAddr
 	service *Service
@@ -108,3 +113,5 @@ func (s *Service) serve(conn *net.TCPConn) {
 		}
 	}
 }
+
+*/

@@ -1,1 +1,5 @@
-*.swp
+# vim swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+[._]tern-port
+[._]#*
