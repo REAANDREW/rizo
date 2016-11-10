@@ -105,6 +105,7 @@ func (instance *RequestRecordingServer) Start() {
 //Stop ...
 func (instance *RequestRecordingServer) Stop() {
 	if instance.server != nil {
+		instance.server.CloseClientConnections()
 		instance.server.Close()
 		time.Sleep(1 * time.Millisecond)
 	}
