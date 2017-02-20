@@ -50,25 +50,16 @@ var _ = Describe("RequestRecordingServer", func() {
 	})
 
 	It("Use", func() {
-		messages := []string{}
 		TestServer.Use(func(request RecordedRequest, w ResponseWriter) {
 			fmt.Printf("%#v\n", w)
-			if len(messages) == 0 {
-				r := []rune(request.Body)
-				switch commandType := r[0]; commandType {
-				case ':':
-					fmt.Println("RESP Integer")
-				case '+':
-					fmt.Println("RESP Simple String")
-				case '-':
-					fmt.Println("RESP Error")
-				case '$':
-					length := request.Body[1:]
-					fmt.Printf("RESP Bulk String %v\n", length)
-				case '*':
-					length := request.Body[1:]
-					fmt.Printf("RESP Array %v\n", length)
-				}
+			r := []rune(request.Body)
+			switch respType := r[0]; respType {
+			case '$':
+				length := request.Body[1:]
+				fmt.Printf("RESP Bulk String %v\n", length)
+			case '*':
+				length := request.Body[1:]
+				fmt.Printf("RESP Array %v\n", length)
 			}
 			w.Send("Talula\r\n")
 		})
@@ -76,7 +67,46 @@ var _ = Describe("RequestRecordingServer", func() {
 		result := client.Send(request)
 		Expect(result).To(Equal("Talula\r\n"))
 	})
+
+	Describe("For", func() {
+		TestServer.Use(func(request RecordedRequest, w ResponseWriter) {
+			fmt.Printf("%#v\n", w)
+			w.Send("For Test\r\n")
+		}).For(RequestWithBody("mylist\r\n"))
+		request = "*2\r\n$4\r\nLLEN\r\n$6\r\nmylist\r\n"
+		result := client.Send(request)
+		Expect(result).To(Equal("For Test\r\n"))
+	})
 })
+
+/*
+type RedisMessage struct {
+	Command  string
+	Messages []string
+}
+
+func (instance *RedisMessage) HasResponse() bool {
+	/*
+		Clone messages
+		Shift first message
+		      Should indicate a RESP Array and its length
+		      Length indicates command string plus how many args
+		Shift next message
+		    Should indicate RESP Bulk String and its length
+		Shift next message
+		    Should be command string, length should match
+		Shift next message
+		    Should indicate RESP Bulk String and its length
+		Shift next message
+		    Should be arg string, length should match
+*/
+/*
+      for _, message := range instance.Messages {
+
+	}
+	return false
+}
+*/
 
 type TCPClient struct {
 	host string
