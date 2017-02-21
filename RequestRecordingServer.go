@@ -23,8 +23,21 @@ type RecordedRequest struct {
 	Body    string
 }
 
+func (this RecordedRequest) String() string {
+	return fmt.Sprintf("'%s %s'", this.Request.Method, this.Request.RequestURI)
+}
+
 //HTTPRequestPredicate ...
-type HTTPRequestPredicate func(request RecordedRequest) bool
+// type HTTPRequestPredicate func(request RecordedRequest) bool
+type HTTPRequestPredicate struct {
+	predicate func(request RecordedRequest) bool
+	label     string
+}
+
+//String ...
+func (this HTTPRequestPredicate) String() string {
+	return this.label
+}
 
 //HTTPResponseFactory ...
 type HTTPResponseFactory func(writer http.ResponseWriter)
@@ -122,7 +135,7 @@ func (instance *RequestRecordingServer) Clear() {
 func (instance *RequestRecordingServer) Evaluate(request RecordedRequest, predicates ...HTTPRequestPredicate) bool {
 	results := make([]bool, len(predicates))
 	for index, predicate := range predicates {
-		results[index] = predicate(request)
+		results[index] = predicate.predicate(request)
 	}
 	thing := true
 	for _, result := range results {
@@ -163,40 +176,53 @@ func (instance *RequestRecordingServer) For(predicates ...HTTPRequestPredicate) 
 
 //RequestWithPath ...
 func RequestWithPath(path string) HTTPRequestPredicate {
-	return HTTPRequestPredicate(func(r RecordedRequest) bool {
-		result := r.Request.URL.Path == path
-		return result
-	})
+	return HTTPRequestPredicate{
+		label: fmt.Sprintf("WithPath: '%s'", path),
+		predicate: func(r RecordedRequest) bool {
+			result := r.Request.URL.Path == path
+			return result
+		}}
 }
 
 //RequestWithMethod ...
 func RequestWithMethod(method string) HTTPRequestPredicate {
-	return HTTPRequestPredicate(func(r RecordedRequest) bool {
-		result := r.Request.Method == method
-		return result
-	})
+	return HTTPRequestPredicate{
+		label: fmt.Sprintf("WithMethod: '%s'", method),
+		predicate: func(r RecordedRequest) bool {
+			result := r.Request.Method == method
+			return result
+		}}
 }
 
 //RequestWithHeader ...
 func RequestWithHeader(key string, value string) HTTPRequestPredicate {
-	return HTTPRequestPredicate(func(r RecordedRequest) bool {
-		result := r.Request.Header.Get(key) == value
-		return result
-	})
+	return HTTPRequestPredicate{
+		label: fmt.Sprintf("WithHeader: '%s':'%s'", key, value),
+		predicate: func(r RecordedRequest) bool {
+			result := r.Request.Header.Get(key) == value
+			return result
+		},
+	}
 }
 
 //RequestWithBody ...
 func RequestWithBody(value string) HTTPRequestPredicate {
-	return HTTPRequestPredicate(func(r RecordedRequest) bool {
-		result := string(r.Body) == value
-		return result
-	})
+	return HTTPRequestPredicate{
+		label: fmt.Sprintf("WithBody: '%s'", value),
+		predicate: func(r RecordedRequest) bool {
+			result := string(r.Body) == value
+			return result
+		},
+	}
 }
 
 //RequestWithQuerystring ...
 func RequestWithQuerystring(value string) HTTPRequestPredicate {
-	return HTTPRequestPredicate(func(r RecordedRequest) bool {
-		result := r.Request.URL.RawQuery == value
-		return result
-	})
+	return HTTPRequestPredicate{
+		label: fmt.Sprintf("WithQuerystring: '%s'", value),
+		predicate: func(r RecordedRequest) bool {
+			result := r.Request.URL.RawQuery == value
+			return result
+		},
+	}
 }

@@ -51,14 +51,18 @@ var _ = Describe("RequestRecordingServer", func() {
 	})
 
 	Describe("Find", func() {
-		var sampleURL string
-		var data string
 
+		var (
+			sampleURL string
+			predicate HTTPRequestPredicate
+		)
+		const (
+			data = "a=1&b=2"
+		)
 		Describe("Single Request", func() {
 			var request *http.Request
 
 			BeforeEach(func() {
-				data = "a=1&b=2"
 				sampleURL = URLForTestServer("/Fubar?" + data)
 				request, _ = http.NewRequest("GET", sampleURL, bytes.NewBuffer([]byte(data)))
 				request.Header.Set("Content-type", "application/json")
@@ -68,32 +72,72 @@ var _ = Describe("RequestRecordingServer", func() {
 				})
 			})
 
-			It("Path", func() {
-				expectedPath := "/Fubar"
-				Expect(TestServer.Find(RequestWithPath(expectedPath))).To(Equal(true))
-			})
-
-			It("Method", func() {
-				expectedMethod := "GET"
-				Expect(TestServer.Find(RequestWithMethod(expectedMethod))).To(Equal(true))
-			})
-
-			It("Header", func() {
-				Expect(TestServer.Find(RequestWithHeader("Content-type", "application/json"))).To(Equal(true))
-			})
-
-			It("Body", func() {
-				request, _ = http.NewRequest("POST", sampleURL, bytes.NewBuffer([]byte(data)))
-				TestServer.Clear()
-				TestServer.Requests = append(TestServer.Requests, RecordedRequest{
-					Request: request,
-					Body:    data,
+			Describe("Path", func() {
+				const expectedPath = "/Fubar"
+				BeforeEach(func() {
+					predicate = RequestWithPath(expectedPath)
 				})
-				Expect(TestServer.Find(RequestWithBody(data))).To(Equal(true))
+				It("provides a String representation", func() {
+					Ω(predicate.String()).Should(Equal("WithPath: '/Fubar'"))
+				})
+				It("can find using the predicate", func() {
+					Expect(TestServer.Find(predicate)).To(Equal(true))
+				})
 			})
 
-			It("Querystring", func() {
-				Expect(TestServer.Find(RequestWithQuerystring(data))).To(Equal(true))
+			Describe("Method", func() {
+				const expectedMethod = "GET"
+				BeforeEach(func() {
+					predicate = RequestWithMethod(expectedMethod)
+				})
+				It("provides a String representation", func() {
+					Ω(predicate.String()).Should(Equal("WithMethod: 'GET'"))
+				})
+				It("can find using the predicate", func() {
+					Expect(TestServer.Find(predicate)).To(Equal(true))
+				})
+			})
+
+			Describe("Header", func() {
+				BeforeEach(func() {
+					predicate = RequestWithHeader("Content-type", "application/json")
+				})
+				It("provides a String representation", func() {
+					Ω(predicate.String()).Should(Equal("WithHeader: 'Content-type':'application/json'"))
+				})
+				It("can find using the predicate", func() {
+					Expect(TestServer.Find(predicate)).To(Equal(true))
+				})
+			})
+
+			Describe("Body", func() {
+				BeforeEach(func() {
+					predicate = RequestWithBody(data)
+				})
+				It("provides a String representation", func() {
+					Ω(predicate.String()).Should(Equal("WithBody: 'a=1&b=2'"))
+				})
+				It("can find using the predicate", func() {
+					request, _ = http.NewRequest("POST", sampleURL, bytes.NewBuffer([]byte(data)))
+					TestServer.Clear()
+					TestServer.Requests = append(TestServer.Requests, RecordedRequest{
+						Request: request,
+						Body:    data,
+					})
+					Expect(TestServer.Find(predicate)).To(Equal(true))
+				})
+			})
+
+			Describe("Querystring", func() {
+				BeforeEach(func() {
+					predicate = RequestWithQuerystring(data)
+				})
+				It("provides a String representation", func() {
+					Ω(predicate.String()).Should(Equal("WithQuerystring: 'a=1&b=2'"))
+				})
+				It("can find using the predicate", func() {
+					Expect(TestServer.Find(predicate)).To(Equal(true))
+				})
 			})
 
 			It("Handles multiple predicates", func() {
@@ -101,6 +145,7 @@ var _ = Describe("RequestRecordingServer", func() {
 				expectedMethod := "GET"
 				Expect(TestServer.Find(RequestWithPath(expectedPath), RequestWithMethod(expectedMethod))).To(Equal(true))
 			})
+
 		})
 
 		Describe("Multiple Requests", func() {
@@ -112,7 +157,6 @@ var _ = Describe("RequestRecordingServer", func() {
 					Request: request,
 				})
 
-				data = "a=1&b=2"
 				postRequest, _ := http.NewRequest("POST", sampleURL, bytes.NewBuffer([]byte(data)))
 				TestServer.Requests = append(TestServer.Requests, RecordedRequest{
 					Request: postRequest,
@@ -152,7 +196,7 @@ var _ = Describe("RequestRecordingServer", func() {
 			TestServer.Clear()
 		})
 
-		FIt("Defines the response to be used for the server", func() {
+		It("Defines the response to be used for the server", func() {
 			message := "Hello World"
 
 			TestServer.Use(func(w http.ResponseWriter) {
